@@ -1,0 +1,30 @@
+{{define "content"}}
+
+<div class="card light-green lighten-3 zindex-3">
+  <div class="card-content white">
+    <span class="card-title">Profile</span>
+  </div>
+  <div class="card-content">
+    <form class="profile" action="/dashboard/profile/" method="post">
+      <label for="name">Name:</label><input type="text" name="name" value="{{$.Name}}"><br>
+      <label for="email">Email:</label><input type="text" name="email" value="{{range $.Emails}}{{.Email}}{{end}}"><br>
+      <label for="dob">Date of Birth:</label><input type="text" class="datepicker" name="dob" value="{{$.About.DOB.Format "2 January, 2006"}}">
+      <button class="btn waves-effect waves-green"type="submit" name="Update" value="Search"><i class="material-icons white-text">save</i></button>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+$('.datepicker').pickadate({
+  selectMonths: true, // Creates a dropdown to control month
+  selectYears: 100,
+  min: new Date(1950, 1, 1),
+  max: new Date(2000, 12, 31),
+  today: 'Today',
+  clear: 'Clear',
+  close: 'Ok',
+  closeOnSelect: false // Close upon selecting a date,
+});
+</script>
+{{end}}

@@ -1,0 +1,12 @@
+{{ define "content" }}
+
+  <div class="form-group" style="padding-left:20px;">
+    <form class="register" action="/register/" method="post">
+      <label for="Name">Name:</label><input type="text" name="name" value=""><br>
+      <label for="Email">Email:</label><input type="text" name="email" value=""><br>
+      <label for="Password">Password: </label><input type="text" name="password" value=""><br>
+      <input type="submit" name="Register" value="Register">
+    </form>
+  </div>
+
+{{end}}

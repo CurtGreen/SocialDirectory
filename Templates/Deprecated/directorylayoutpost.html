@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/Public/layout.css">
+    <title>MyAcu Acupuncturists Community</title>
+  </head>
+  <body>
+    <div class="branding" style="height:10%; width:90%; margin:auto; background-color:white; border: #ffffff; border-bottom: thick #ff0000; border-style: solid; ">
+        <img src="/Public/MyAcu.png" style=" top: 1%; left: 10%; height: 73%; width: 25%;">
+    </div>
+    {{template "navigation"}}
+
+    <div style="display:block; margin:auto; width: 90%; height:100%; background-color: #CFB53B; padding-bottom:5%;">
+      <div class="form-group" style="padding-left:20px;">
+        <form class="location" action="/directory/" method="post">
+          <label for="location">Search in:</label><input type="text" name="location" value=""><br>
+          <input type="submit" name="Search" value="Search">
+        </form>
+      </div>
+      <p style="padding-left:30px; padding-top: 40px;">
+
+
+        <!-- <iframe  width="780",  height="500",  frameborder="2", style="border:1",  src="https://www.google.com/maps/embed/v1/search?key=AIzaSyBIoz6I_yLl458Lyzzk2nn2zse9MCfyroI&q=acupuncture+in+Chattanooga", allowfullscreen> -->
+        <!-- </iframe> -->
+      </p>
+      <div id="map"></div>
+      <div id="table">
+        <table>
+          <tr>
+            <th>ID</th><th>Name</th><th>Address</th><th>Distance</th>
+          </tr>
+          {{range .Results}}
+          <tr>
+            <td>{{.OrganizationID}}</td><td>{{.Name}}</td><td>{{.Street}}</td><td>{{.Distance }} Miles</td>
+          </tr>
+          {{end}}
+        </table>
+      </div>
+    </div>
+
+
+
+  </body>
+  <script>
+    function initMap() {
+      var location = {lat: {{.Location.Lat}}, lng: {{.Location.Lng}}};
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: location
+      });
+      var marker = new google.maps.Marker({
+        position: location,
+        map: map
+      });
+
+      var goldStar = {
+    path: 'M 125,5 155,90 245,90 175,145 200,230 125,180 50,230 75,145 5,90 95,90 z',
+    fillColor: 'green',
+    fillOpacity: 0.8,
+    scale: 0.1,
+    strokeColor: 'gold',
+    strokeWeight: 1
+  };
+
+      {{range .Results}}
+      var result =  {lat: {{.Lat}}, lng:{{.Lng}}};
+      var name = {{.Name}};
+      var marker2 = new google.maps.Marker({
+        position: result,
+        map: map,
+        title: name,
+        icon: goldStar
+      });
+
+      {{end}}
+
+    };
+  </script>
+  <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkzm70gs5HDFmj63c9GXAoPuNDYd-mElg&callback=initMap">
+  </script>
+</html>

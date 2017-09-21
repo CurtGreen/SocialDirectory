@@ -1,0 +1,24 @@
+{{ define "navigation"}}
+
+    <ul id="slide-out" class="side-nav fixed light-green col s1 m2 l3"  style="padding-top: 20vh;">
+      <li class="nav"><a class="navlink" href="/directory/"><i class="material-icons">explore</i>Directory</a></li>
+      <li class="nav"><a class="navlink" href="#"><i class="material-icons">library_books</i>Articles</a></li>
+      <li class="no-padding">
+        <ul class="collapsible collapsible-accordion light-green">
+          <li class="nav">
+            <a class="collapsible-header" href="#">Dashboard <i class="material-icons">arrow_drop_down</i></a>
+            <div class="collapsible-body light-green">
+              <ul>
+                <li class="nav"><a class="navlink" href="/dashboard/my/"><i class="material-icons">settings</i>Settings</a></li>
+                <li class="nav"><a class="navlink" href="/dashboard/profile/"><i class="material-icons">account_circle</i>Profile</a></li>
+                <li class="nav"><a class="navlink" href="/dashboard/organizations/"><i class="material-icons">storage</i>Organizations</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </li>
+      <li class="nav"><a class="navlink" href="/logout/"><i class="material-icons">close</i>Logout</a></li>
+    </ul>
+  </div>
+
+{{end }}

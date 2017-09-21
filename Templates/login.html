@@ -1,0 +1,16 @@
+{{ define "content" }}
+
+  <div class="form-group" style="padding-left:20px;">
+    <form class="login" action="/login/" method="post">
+      <label for="Email">Email:</label><input type="text" name="email" value=""><br>
+      <label for="Password">Password: </label><input type="text" name="password" value=""><br>
+      <input type="submit" name="Login" value="Login">
+    </form>
+  </div>
+
+<div id="sociallogin">
+  <a href="/googlelogin/">Login With Google</a>
+  <a href="/facebooklogin/">Login With Facebook</a>
+
+</div>
+{{end}}
