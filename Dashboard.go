@@ -13,16 +13,15 @@ import (
 
 // DashboardHandler Handles requests for dashboard
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	user := User{}
-	Db, err := gorm.Open(DATABASE, CREDENTIALS)
-	if err != nil {
-		log.Panic(err)
+	ctx := r.Context()
+	currentUser := ctx.Value(contextKey("currentUser"))
+	fmt.Printf("Current User by Context is: %v\n", currentUser)
+	if currentUser == "guest" {
+		http.Error(w, "Attempted to access restricted content without logging in a user", http.StatusUnauthorized)
+	} else {
+		t, _ := template.ParseFiles("Templates/contentlayout.html", "Templates/privatenav.html", "Templates/dashboardcontent.html")
+		t.Execute(w, fmt.Sprintf("Dashboard! %v", currentUser))
 	}
-	defer Db.Close()
-	userID, _ := session.GetInt(r, "userID")
-	Db.Where("id = ?", uint(userID)).Find(&user)
-	t, _ := template.ParseFiles("Templates/contentlayout.html", "Templates/privatenav.html", "Templates/dashboardcontent.html")
-	t.Execute(w, fmt.Sprintf("Dashboard! %v", user))
 
 }
 

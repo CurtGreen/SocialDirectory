@@ -20,7 +20,7 @@ func Init() {
 	if err != nil {
 		log.Panic(err)
 	}
-	Db.AutoMigrate(&User{}, &Profile{}, &Email{}, &Address{}, &Speciality{}, &Organization{}, &Membership{}, &Event{}, &Message{}, &Comment{}, &Contact{}, &SocialUser{})
+	Db.AutoMigrate(&User{}, &Profile{}, &Email{}, &Address{}, &Speciality{}, &Organization{}, &Membership{}, &Event{}, &Message{}, &Comment{}, &Contact{}, &SocialUser{}, &Role{})
 	Db.Raw("SELECT AddGeometryColumn('addresses', 'geom', 4326, 'POINT', 2);	CREATE INDEX idx_organization_addresses ON addresses USING gist(geom);")
 	return
 }
@@ -50,16 +50,16 @@ func main() {
 	// Set Standard Routes
 	multiplex.HandleFunc("/", WelcomeHandler)
 	multiplex.HandleFunc("/directory/", DirectoryHandler)
-	multiplex.HandleFunc("/dashboard/my/", AuthServe(DashboardHandler))
-	multiplex.HandleFunc("/dashboard/profile/", AuthServe(ProfileHandler))
-	multiplex.HandleFunc("/dashboard/organizations/", AuthServe(OrganizationHandler))
+	multiplex.HandleFunc("/dashboard/my/", DashboardHandler)
+	multiplex.HandleFunc("/dashboard/profile/", ProfileHandler)
+	multiplex.HandleFunc("/dashboard/organizations/", OrganizationHandler)
 	multiplex.HandleFunc("/register/", RegisterHandler)
 	multiplex.HandleFunc("/login/", LoginHandler)
 	multiplex.HandleFunc("/googlelogin/", LoginWithGoogle)
 	multiplex.HandleFunc("/GoogleCallback/", GoogleCallback)
 	multiplex.HandleFunc("/facebooklogin/", LoginWithFacebook)
 	multiplex.HandleFunc("/FacebookCallback/", FacebookCallback)
-	multiplex.HandleFunc("/logout/", AuthServe(LogoutHandler))
+	multiplex.HandleFunc("/logout/", LogoutHandler)
 
-	http.ListenAndServe("127.0.0.1:8000", handlers.LoggingHandler(os.Stdout, sessionManager(multiplex)))
+	http.ListenAndServe("127.0.0.1:8000", handlers.LoggingHandler(os.Stdout, sessionManager(AuthServe(multiplex))))
 }

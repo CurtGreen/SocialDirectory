@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -18,6 +19,9 @@ import (
 	"github.com/alexedwards/scs/session"
 	"github.com/jinzhu/gorm"
 )
+
+// Context key type for AuthServe
+type contextKey string
 
 // SocialInfo Struct for parsing JSON token response
 type SocialInfo struct {
@@ -58,18 +62,21 @@ func GetNewStateString() string {
 }
 
 // AuthServe middleware to handle Authentication via Session Cookies
-func AuthServe(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func AuthServe(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		currentUser := contextKey("currentUser")
 		userID, err := session.GetInt(r, "userID")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-		}
-		if userID > 0 {
-			handler(w, r)
+		//If user logged in then retrieve user record from Database and pass through context
+		if err == nil && userID > 0 {
+			ctx := context.WithValue(r.Context(), currentUser, "authorized")
+			handler.ServeHTTP(w, r.WithContext(ctx))
 		} else {
-			http.Redirect(w, r, "/", http.StatusUnauthorized)
+			// User is not logged in
+			ctx := context.WithValue(r.Context(), currentUser, "guest")
+			handler.ServeHTTP(w, r.WithContext(ctx))
 		}
-	}
+
+	})
 }
 
 // LoginHandler Handles requests for logging into Services

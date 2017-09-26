@@ -16,6 +16,7 @@ type User struct {
 	About          Profile        `gorm:"ForeignKey:UserID"`
 	Organizations  []Organization `gorm:"ForeignKey:UserID"`
 	Memberships    []Membership   `gorm:"ForeignKey:UserID"`
+	Roles          []Role         `gorm:"ForeignKey:UserID"`
 	Subscription   bool
 	SocialAccounts []SocialUser `gorm:"ForeignKey:UserID"`
 }
@@ -64,7 +65,7 @@ func (user *User) GetByID(uid uint) error {
 		return err
 	}
 
-	Db.Debug().Preload("Emails").Preload("About").Preload("Organizations").Preload("Organizations.Location").Preload("Memberships").Preload("SocialAccounts").Where("id = ?", uid).Find(user)
+	Db.Debug().Preload("Emails").Preload("About").Preload("Organizations").Preload("Organizations.Location").Preload("Memberships").Preload("SocialAccounts").Preload("Roles").Where("id = ?", uid).Find(user)
 	return err
 }
 
@@ -84,7 +85,7 @@ type Email struct {
 	UserID int
 }
 
-// UID method from returning userID from email lookup
+// UID method for returning userID from email lookup
 func (email *Email) UID(emailAddress string) uint {
 	Db, err := gorm.Open(DATABASE, CREDENTIALS)
 	defer Db.Close()
@@ -111,6 +112,13 @@ type Address struct {
 	Lng            float64 `gorm:"type:double precision"`
 	OrganizationID int     `sql:"unique"`
 	ProfileID      int
+}
+
+//Role type holds Application wide Roles for User
+type Role struct {
+	gorm.Model
+	Name   string
+	UserID int
 }
 
 // Speciality type holds User's practicing specialities
