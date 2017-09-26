@@ -62,17 +62,45 @@ func GetNewStateString() string {
 }
 
 // AuthServe middleware to handle Authentication via Session Cookies
+// It attempts to load userID from sessionManager, and serves it's handler with Appropriate
+// context
 func AuthServe(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		currentUser := contextKey("currentUser")
 		userID, err := session.GetInt(r, "userID")
-		//If user logged in then retrieve user record from Database and pass through context
+		//If user logged in then send authorized status
 		if err == nil && userID > 0 {
 			ctx := context.WithValue(r.Context(), currentUser, "authorized")
 			handler.ServeHTTP(w, r.WithContext(ctx))
 		} else {
-			// User is not logged in
+			// User is not logged in send guest status
 			ctx := context.WithValue(r.Context(), currentUser, "guest")
+			handler.ServeHTTP(w, r.WithContext(ctx))
+		}
+
+	})
+}
+
+// CSRFServe provides middleware for protecting forms from CSRF attack
+// We create a randomized state string for each GET request for a CSRF protected
+// handler, storing it in session and passing it along with the context for additional
+// processing with the requested content.
+// On Post requests we attempt to retrieve this random string from session
+// log a Panic if the csrftoken doesn't exist, and pass it in context if it does
+func CSRFServe(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			session.PutString(r, "csrftoken", GetNewStateString())
+			handler.ServeHTTP(w, r)
+		case http.MethodPost:
+			csrftoken := contextKey("csrftoken")
+			csrfString, err := session.GetString(r, "csrftoken")
+			if err != nil {
+				log.Panicf("CSRF string not in Session: %v", err.Error())
+
+			}
+			ctx := context.WithValue(r.Context(), csrftoken, csrfString)
 			handler.ServeHTTP(w, r.WithContext(ctx))
 		}
 
