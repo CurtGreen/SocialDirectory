@@ -42,6 +42,13 @@ func main() {
 	// Session storage engine Initialization
 	engine := memstore.New(0)
 	sessionManager := session.Manage(engine)
+	// Database connection
+	Db, err := gorm.Open(DATABASE, CREDENTIALS)
+	defer Db.Close()
+	if err != nil {
+		log.Panicf("Could not establish Database Connection: %v", err.Error())
+	}
+
 	multiplex := mux.NewRouter()
 	multiplex.StrictSlash(true)
 	// Setup path to Public folder to serve files from file system
